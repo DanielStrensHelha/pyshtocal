@@ -1,0 +1,50 @@
+This readme file will tell you how to use this program !
+
+First you need credentials to access your calendar and sheet. The sheet credentials may be readonly, although I used the complete ones in my code.
+  There is more than one way to access those data.
+  The one I used is the service account.
+  
+  Create a project on console.cloud.google.com,
+  Add the sheets and calendar API,
+  Create a service account,
+  
+  In google sheet, add your service account email to the people who can access the sheet.
+  Same for your calendar (I recommend creating a new calendar, it might not work properly on your main one + it looks cleaner)
+  Once you downloaded the repository, add (at the root) the credential json file from your service account as 'keys.json'.
+  
+Then you need to add some personnal data for the script to work :
+  Add a folder "personnal" (which is ignored by git) and a python file 'informations.py' in it.
+  Create some constants in this file :
+    SPREADSHEAT_ID = '...'
+    RANGE_NAME = 'Sheet!A:A' <- eg
+    CALENDAR_ID = '...@group.calendar.google.com'
+    TIME_ZONE = '...'
+    
+If you run this code from VSCode, install the packages with the command :
+    pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
+If you want to make a script in batch to run this code, it might not find the packages like this. You need to do this first :
+  In a command prompt, go to the root of the project,
+  Create a virtual environment :  py -m venv env
+  Activate the environment : .\env\Scripts\activate
+  (Re)download the google api packages : pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+  If you're inside the virtual environment, you will be able to run the script.
+  
+  The .bat file assumes you have a virtual environment env\.
+  
+What to put in the sheet :
+  In the google sheet, you need 3 column (idealy adjacent) that contain, 
+    First column : date (formatted dd/mm/yyyy)
+    Second column : start time (formatted hh:mm)
+    Third column : end time (formatted hh:mm)
+    
+If you don't live in belgium :
+  You probably have a different time zone than me.
+  You need to go to the file eventsAndShifts.py,
+  In the function dateTimeFromShift(date, time, season) :
+    Modify the line 
+      toReturn += ':00+01:00' if season == "winter" else ':00+02:00'
+    If your country changes the time during winter, you just need to update the values (+01.. and +02..)
+    If it doesn't, you can just keep
+      toReturn += ':00+01:00'
+    and update the +01.. to fit your time zone
