@@ -1,4 +1,5 @@
-#Personnal data
+#Personnal data and venv
+env/*
 *.json
 personnal/*
 
