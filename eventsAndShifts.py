@@ -1,4 +1,8 @@
 import datetime
+from personnal.informations import *
+
+from event import EVENT
+from copy import deepcopy
 
 """------------------------------------- FUNCTIONS -------------------------------------"""
 def checkShiftEvent(event, shiftList):
@@ -39,3 +43,15 @@ def dateTimeFromShift(date, time, season):
     toReturn += ':00+01:00' if season == "winter" else ':00+02:00'
     
     return toReturn
+
+
+def addShift(shift, season, service):
+    shiftStart = dateTimeFromShift(shift[0], shift[1], season)
+    shiftEnd = dateTimeFromShift(shift[0], shift[2], season)
+
+    workingEvent = deepcopy(EVENT)
+    workingEvent['start']['dateTime'] = shiftStart
+    workingEvent['end']['dateTime'] = shiftEnd
+
+    workingEvent = service.events().insert(calendarId=CALENDAR_ID, body=workingEvent).execute()
+    print ('Event created: %s' % (workingEvent.get('htmlLink')))

@@ -28,8 +28,6 @@ creds = service_account.Credentials.from_service_account_file(
         SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
 
-
-
 """---------------------------------------- MAIN FUNCTION ----------------------------------------"""
 def main():
     """ Fetches date and time of work in sheet, then creates / updates events in google calendar. """
@@ -74,10 +72,27 @@ def main():
 
             # Purge calendar and list of events to add :
             season = "summer"
+            
+
             for event in events:
                 if (event['summary'] == 'Time change'):
                     print("\n\nEVENT TIME CHANGE DETECTED :\n" + season + "\nTO ")
                     print(event["description"])
+
+                    eventDateTemp = event['start']['dateTime']
+                    eventDate = datetime.date(int(eventDateTemp[0:4]), int(eventDateTemp[5:7]), int(eventDateTemp[8:10]))
+                    
+                    for i, shift in enumerate(shiftList):
+                        if (eventDate.strftime("%d/%m/%Y") == shift[0]):
+                            for j in range(i):
+                                del shiftList[0]
+                            
+                            break
+
+                        print('shift to add : ', shift)
+                        addShift(shift, season, service)
+
+                    
                     season = event["description"]
                     continue
 
@@ -90,28 +105,9 @@ def main():
                     service.events().delete(calendarId=CALENDAR_ID, eventId=event['id']).execute()
             
             # Add events to calendar            
-            for shift in shiftList:
+            for i, shift in enumerate(shiftList):
                 print('shift to add : ', shift)
-
-                shiftStart = dateTimeFromShift(shift[0], shift[1], season)
-                shiftEnd = dateTimeFromShift(shift[0], shift[2], season)
-                newEvent = {
-                'summary': 'Work Sushi-shop',
-                'location': '55 Boulevart Joseph-Tirou, Charleroi, 6000 Charleroi',
-                'description': '',
-
-                'start': {
-                    'dateTime': shiftStart,
-                    'timeZone': TIME_ZONE,
-                },
-                'end': {
-                    'dateTime': shiftEnd,
-                    'timeZone': TIME_ZONE,
-                }
-                }
-
-                newEvent = service.events().insert(calendarId=CALENDAR_ID, body=newEvent).execute()
-                print ('Event created: %s' % (newEvent.get('htmlLink')))
+                addShift(shift, season, service)
 
         except HttpError as error:
             print('An error occurred: %s' % error)
