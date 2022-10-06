@@ -39,7 +39,6 @@ def checkShiftEvent(event, shiftList):
 
 def dateTimeFromShift(date, time, season):
     toReturn = str(date[6:10] + '-' + date[3:5] + '-' + date[0:2] + 'T' + time[0:2] + ':' + time[3:5])
-
     toReturn += ':00+01:00' if season == "winter" else ':00+02:00'
     
     return toReturn
